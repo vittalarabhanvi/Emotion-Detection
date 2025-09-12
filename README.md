@@ -1,37 +1,80 @@
-# Emotion-Detection
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+#!/usr/bin/env bash
+set -euo pipefail
 
-## Getting Started
+# === CONFIG ===
+FILE_ID="17f1Q2OT6MFxMiTiSWlYRwDY25OceEjeF"   # Google Drive file id from your link
+DEST="models/large_model.bin"                # where the file will be saved
+GITIGNORE=".gitignore"
+README="README.md"
+MARKER="<!-- MODEL-DOWNLOAD-NOTE -->"
+# ==============
 
-First, run the development server:
+echo "→ Preparing to download model to: $DEST"
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+mkdir -p "$(dirname "$DEST")"
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# install gdown if missing
+if ! command -v gdown >/dev/null 2>&1; then
+  echo "→ gdown not found — installing with pip (user)"
+  if command -v pip3 >/dev/null 2>&1; then
+    pip3 install --user gdown
+  elif command -v pip >/dev/null 2>&1; then
+    pip install --user gdown
+  else
+    echo "ERROR: pip not found. Please install pip or gdown and re-run this script."
+    exit 1
+  fi
+  export PATH="$HOME/.local/bin:$PATH"
+fi
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+echo "→ Downloading from Google Drive (file id: $FILE_ID) ..."
+gdown --id "$FILE_ID" -O "$DEST"
+echo "✓ Download finished: $DEST"
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# update .gitignore (idempotent)
+if [ ! -f "$GITIGNORE" ] || ! grep -q "/models/" "$GITIGNORE" 2>/dev/null; then
+  echo "→ Adding models/ ignore entries to $GITIGNORE"
+  cat >> "$GITIGNORE" <<'EOF'
 
-## Learn More
+# ignore large model files
+/models/
+/*.bin
+*.pt
+*.ckpt
+EOF
+  echo "✓ Updated $GITIGNORE"
+else
+  echo "→ $GITIGNORE already contains models/ entry — skipping"
+fi
 
-To learn more about Next.js, take a look at the following resources:
+# append README note (idempotent)
+if [ ! -f "$README" ]; then
+  echo "→ $README not found — creating it"
+  echo "# Project" > "$README"
+fi
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+if ! grep -q "$MARKER" "$README" 2>/dev/null; then
+  echo "→ Appending model-download note to $README"
+  cat >> "$README" <<EOF
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+$MARKER
+> **Note:** The large model file was removed from the repository ( > 1 GB ).  
+> You can download it separately by running:
+>
+> ```bash
+> chmod +x scripts/download_and_setup_model.sh
+> ./scripts/download_and_setup_model.sh
+> ```
+>
+> Manual link (Google Drive): https://drive.google.com/file/d/17f1Q2OT6MFxMiTiSWlYRwDY25OceEjeF/view
+EOF
+  echo "✓ README updated"
+else
+  echo "→ README already contains model-download note — skipping"
+fi
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+echo
+echo "Suggested git commit message:"
+echo "  chore: remove large model file (>1GB) and add download instructions + script"
+echo
+echo "All done. If you plan to share the repo publicly, ensure the Drive file is set to 'Anyone with the link' or move it to a public hosting location."
