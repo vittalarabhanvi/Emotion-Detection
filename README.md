@@ -59,8 +59,6 @@ Place the downloaded model at:
 models/large_model.bin
 ```
 
-(Adjust paths in your code if you use a different name or location.)
-
 ---
 
 ## Prevent accidental commits
