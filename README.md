@@ -1,7 +1,4 @@
-# Project README
-
-````md
-# Project Title
+# Emotion Detection
 
 A short description of your project — what it does and why it exists.
 
@@ -29,7 +26,7 @@ yarn dev
 pnpm dev
 # or
 bun dev
-````
+
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
@@ -105,12 +102,3 @@ chore: remove large model file (>1GB) and add download instructions + script
 * Deploy on Vercel: [https://vercel.com/new](https://vercel.com/new)
 
 ---
-
-## License
-
-Specify a license (e.g. `MIT`) or remove this section if not applicable.
-
-```
-
-Paste the content above into a file named `README.md` at the project root. Want me to also generate a compact `README` without the long explanation (short version) or produce a ready-to-commit file diff?
-```
