@@ -1,6 +1,6 @@
 # Emotion Detection
 
-[cite_start]An intelligent, web-based chatbot designed for the early detection of depressive symptoms[cite: 42]. This project leverages a hybrid deep learning model to provide accessible and low-friction mental health self-assessment, bridging the gap between users and professional care.
+An intelligent, web-based chatbot designed for the early detection of depressive symptoms[cite: 42]. This project leverages a hybrid deep learning model to provide accessible and low-friction mental health self-assessment, bridging the gap between users and professional care.
 
 ---
 
